@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modara · New season</title>
+  <link rel="stylesheet" href="store.css">
+</head>
+<body data-page="products">
+  <header class="store">
+    <a class="brand" href="index.html">MOD<i>A</i>RA</a>
+    <span class="spacer"></span>
+    <a class="icon-btn" id="bag-link" href="cart.html" aria-label="Bag">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+      <span class="badge" id="bag-count">0</span>
+    </a>
+  </header>
+  <main>
+    <section class="hero">
+      <small>NEW SEASON</small>
+      <h1>The Weekend Edit</h1>
+      <p>Fresh fits, everyday essentials and extra savings at checkout.</p>
+      <div class="shape"></div>
+    </section>
+    <div class="chips" id="chips"></div>
+    <div class="section-title">Popular picks</div>
+    <div class="grid" id="products"></div>
+  </main>
+  <script src="store.js"></script>
+  <script>
+    (function () {
+      var store = window.DemoStore;
+      var grid = document.getElementById('products');
+      var chips = document.getElementById('chips');
+      var categories = ['all', 'footwear', 'apparel', 'accessories', 'electronics'];
+      var active = 'all';
+
+      function renderCount() {
+        var n = store.count();
+        var badge = document.getElementById('bag-count');
+        badge.textContent = n;
+        badge.style.display = n ? 'flex' : 'none';
+      }
+
+      function renderChips() {
+        chips.innerHTML = '';
+        categories.forEach(function (c) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'chip' + (c === active ? ' on' : '');
+          b.textContent = c.charAt(0).toUpperCase() + c.slice(1);
+          b.addEventListener('click', function () { active = c; renderChips(); renderProducts(); });
+          chips.appendChild(b);
+        });
+      }
+
+      function renderProducts() {
+        grid.innerHTML = '';
+        store.products.filter(function (p) { return active === 'all' || p.category === active; }).forEach(function (p) {
+          var card = document.createElement('div');
+          card.className = 'product';
+          var off = Math.round((1 - p.price / p.mrp) * 100);
+          card.innerHTML =
+            '<div class="art" style="background:' + p.tint + '">' + store.art(p.sku) + '</div>' +
+            '<div class="info"><div class="product-name"></div><div class="cat"></div>' +
+            '<div class="price-row"><span class="price"></span><span class="mrp"></span><span class="off"></span></div>' +
+            '<button class="outline full" type="button">Add to bag</button></div>';
+          card.querySelector('.product-name').textContent = p.name;
+          card.querySelector('.cat').textContent = p.category;
+          card.querySelector('.price').textContent = store.rupees(p.price);
+          card.querySelector('.mrp').textContent = store.rupees(p.mrp);
+          card.querySelector('.off').textContent = off + '% off';
+          var button = card.querySelector('button');
+          button.setAttribute('data-sku', p.sku);
+          button.addEventListener('click', function () {
+            store.setQty(p.sku, store.qty(p.sku) + 1);
+            renderCount();
+            button.textContent = 'Added to bag ✓';
+            button.className = 'dark full';
+            setTimeout(function () { button.textContent = 'Add to bag'; button.className = 'outline full'; }, 1100);
+          });
+          grid.appendChild(card);
+        });
+      }
+
+      renderChips();
+      renderProducts();
+      renderCount();
+    })();
+  </script>
+</body>
+</html>

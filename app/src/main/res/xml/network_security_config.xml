@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cleartext HTTP is disabled everywhere. The assignment's coupon URL is http://, but
+     coupons.buyhatke.com also serves HTTPS (verified 2026-10-24), so no exception is needed. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

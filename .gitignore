@@ -1,0 +1,105 @@
+# ========================
+# Android / Gradle
+# ========================
+*.iml
+.gradle/
+.kotlin/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+app/build/
+**/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# Generated files
+bin/
+gen/
+out/
+release/
+
+# Gradle wrapper
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# ========================
+# Signing / Secrets
+# ========================
+*.jks
+*.keystore
+keystore.properties
+google-services.json
+google-services-test.json
+secrets.properties
+
+# ========================
+# Kotlin / Java
+# ========================
+*.class
+*.jar
+*.war
+*.aar
+*.ap_
+*.dex
+
+# ========================
+# Android Studio / IntelliJ IDEA
+# ========================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# ========================
+# OS generated files
+# ========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ========================
+# NDK / CMake
+# ========================
+.externalNativeBuild/
+.cxx/
+*.so
+
+# ========================
+# Test / Coverage
+# ========================
+.test-results/
+.coverage/
+htmlcoverage/
+jacoco/
+*.exec
+
+# ========================
+# Lint
+# ========================
+lint/intermediates/
+lint/generated/
+lint/outputs/
+lint/tmp/
+
+# ========================
+# Profiling
+# ========================
+captures/
+
+# ========================
+# Misc
+# ========================
+*.log
+*.tmp
+*.bak
+*.swp
+*~.nib

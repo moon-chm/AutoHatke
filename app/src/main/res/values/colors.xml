@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Window colours used before Compose draws; mirror core/designsystem/Color.kt -->
+    <color name="brand_indigo">#4F46E5</color>
+    <color name="window_light">#F1F5F9</color>
+    <color name="window_dark">#0B0D1A</color>
+    <color name="launcher_background">#4F46E5</color>
+</resources>

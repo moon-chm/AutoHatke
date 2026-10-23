@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modara · Shopping bag</title>
+  <link rel="stylesheet" href="store.css">
+</head>
+<body data-page="cart">
+  <header class="store">
+    <a class="back" href="index.html" aria-label="Back to shop">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Shopping bag
+    </a>
+    <span class="spacer"></span>
+    <a class="brand" href="index.html" style="font-size:16px;letter-spacing:3px">MOD<i>A</i>RA</a>
+  </header>
+  <main class="stack">
+    <div class="steps"><span class="on">BAG</span><span class="bar"></span><span>ADDRESS</span><span class="bar"></span><span>PAYMENT</span></div>
+
+    <section class="card">
+      <div id="cart-items"></div>
+      <div class="empty" id="cart-empty" hidden>
+        <p style="font-weight:700;margin:0 0 4px">Your bag is empty</p>
+        <p style="color:var(--ink-2);margin:0 0 12px;font-size:14px">Add a few favourites and come back here.</p>
+        <a href="index.html"><button class="dark" type="button">Continue shopping</button></a>
+      </div>
+    </section>
+
+    <section class="card" id="coupon-box">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
+        Coupons
+      </h2>
+      <form class="coupon-row" id="coupon-form" autocomplete="off">
+        <input id="coupon-input" name="coupon" placeholder="Enter coupon code" aria-label="Coupon code" maxlength="40" autocapitalize="characters" spellcheck="false">
+        <button class="dark" id="coupon-apply" type="submit">Apply</button>
+      </form>
+      <div id="coupon-message" data-state="idle" data-seq="0" role="status" aria-live="polite"></div>
+      <div class="applied" id="applied-coupon" data-code="" hidden>
+        <span id="applied-label"></span>
+        <button id="coupon-remove" type="button">Remove</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Price details</h2>
+      <div class="summary-row"><span>Bag total</span><span id="summary-subtotal" data-minor="0" data-currency="INR"></span></div>
+      <div class="summary-row"><span>Coupon discount</span><span class="discount" id="summary-discount" data-minor="0" data-currency="INR"></span></div>
+      <div class="summary-row"><span>Delivery</span><span class="discount">FREE</span></div>
+      <div class="summary-row total"><span>Total amount</span><span id="summary-total" data-minor="0" data-currency="INR"></span></div>
+    </section>
+
+    <div class="paybar">
+      <div>
+        <div class="amt" id="paybar-total"></div>
+        <div class="sub" id="paybar-saving"></div>
+      </div>
+      <!-- Modara has no ordering or payment. The button only explains that; AutoCoupons never touches it. -->
+      <button class="primary" id="place-order" type="button">Place order</button>
+    </div>
+    <p class="note" id="order-note" hidden>Modara is a sample store, so orders can't be placed here.</p>
+  </main>
+
+  <script src="store.js"></script>
+  <script>
+    (function () {
+      var store = window.DemoStore;
+      var items = document.getElementById('cart-items');
+      var message = document.getElementById('coupon-message');
+      var input = document.getElementById('coupon-input');
+      var applyButton = document.getElementById('coupon-apply');
+      var applied = document.getElementById('applied-coupon');
+
+      function setMessage(state, text) {
+        message.textContent = text || '';
+        message.setAttribute('data-seq', String(Number(message.getAttribute('data-seq')) + 1));
+        message.setAttribute('data-state', state);
+      }
+
+      function setAmount(id, minor) {
+        var el = document.getElementById(id);
+        el.setAttribute('data-minor', String(minor));
+        el.textContent = (id === 'summary-discount' && minor > 0 ? '− ' : '') + store.rupees(minor);
+      }
+
+      function render() {
+        items.innerHTML = '';
+        var lines = store.lines();
+        document.getElementById('cart-empty').hidden = lines.length > 0;
+        lines.forEach(function (line) {
+          var row = document.createElement('div');
+          row.className = 'line';
+          row.setAttribute('data-sku', line.product.sku);
+          row.setAttribute('data-qty', String(line.qty));
+          row.innerHTML =
+            '<div class="art" style="background:' + line.product.tint + '">' + store.art(line.product.sku) + '</div>' +
+            '<div class="line-info"><div class="product-name"></div><div class="cat"></div>' +
+            '<div class="price-row"><span class="price"></span><span class="mrp"></span></div>' +
+            '<div class="qty"><button type="button" data-action="dec" aria-label="Decrease quantity">−</button>' +
+            '<output></output><button type="button" data-action="inc" aria-label="Increase quantity">+</button></div></div>';
+          row.querySelector('.product-name').textContent = line.product.name;
+          row.querySelector('.cat').textContent = line.product.category;
+          row.querySelector('.price').textContent = store.rupees(line.product.price);
+          row.querySelector('.mrp').textContent = store.rupees(line.product.mrp);
+          row.querySelector('output').textContent = line.qty;
+          row.querySelector('[data-action="dec"]').addEventListener('click', function () { changeQty(line.product.sku, -1); });
+          row.querySelector('[data-action="inc"]').addEventListener('click', function () { changeQty(line.product.sku, 1); });
+          items.appendChild(row);
+        });
+
+        var sub = store.subtotal();
+        var discount = store.discount();
+        setAmount('summary-subtotal', sub);
+        setAmount('summary-discount', discount);
+        setAmount('summary-total', sub - discount);
+        document.getElementById('paybar-total').textContent = store.rupees(sub - discount);
+        document.getElementById('paybar-saving').textContent = discount > 0 ? 'You save ' + store.rupees(discount) : '';
+
+        var code = store.coupon();
+        applied.hidden = !code;
+        applied.setAttribute('data-code', code || '');
+        document.getElementById('applied-label').textContent = code ? '✓ ' + code + ' applied' : '';
+        document.getElementById('coupon-box').hidden = lines.length === 0;
+        document.querySelector('.paybar').style.display = lines.length ? 'flex' : 'none';
+      }
+
+      function changeQty(sku, delta) {
+        var dropped = store.setQty(sku, store.qty(sku) + delta);
+        if (dropped) setMessage('rejected', dropped + ' was removed because your bag no longer qualifies');
+        render();
+      }
+
+      document.getElementById('coupon-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (applyButton.disabled) return;
+        applyButton.disabled = true;
+        setMessage('pending', 'Checking coupon…');
+        store.applyCoupon(input.value, function (result) {
+          applyButton.disabled = false;
+          if (result.ok) input.value = '';
+          setMessage(result.ok ? 'applied' : 'rejected', result.message);
+          render();
+        });
+      });
+
+      document.getElementById('coupon-remove').addEventListener('click', function () {
+        setMessage('pending', 'Removing coupon…');
+        store.removeCoupon(function () {
+          setMessage('idle', '');
+          render();
+        });
+      });
+
+      document.getElementById('place-order').addEventListener('click', function () {
+        document.getElementById('order-note').hidden = false;
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
