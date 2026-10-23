@@ -19,7 +19,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -79,12 +82,14 @@ fun HomeTab(
     onLink: (String) -> Unit,
     onShowSavings: () -> Unit,
     onShowHowItWorks: () -> Unit,
+    listState: LazyListState = rememberLazyListState(),
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val stores = state.retailers.filter { query.isBlank() || looksLikeLink(query) || it.displayName.contains(query.trim(), ignoreCase = true) }
 
     LazyColumn(
         Modifier.fillMaxSize(),
+        state = listState,
         contentPadding = PaddingValues(bottom = 128.dp),
         verticalArrangement = Arrangement.spacedBy(Spacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -161,7 +166,8 @@ private fun Hero(name: String?, query: String, onQuery: (String) -> Unit, onSubm
                     "At checkout, tap the coupon bubble. We test every code and apply the one that saves you most.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White.copy(alpha = 0.85f),
-                    modifier = Modifier.widthIn(max = 220.dp),
+                    // Leave room for the ticket art on narrow screens and large font sizes.
+                    modifier = Modifier.padding(end = 120.dp).widthIn(max = 240.dp),
                 )
             }
         }
@@ -241,6 +247,8 @@ private fun StoreShelf(stores: List<RetailerConfig>, filtered: Boolean, onOpenSt
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
             color = BrandColors.Shelf,
+            // Faint edge so the dark shelf still reads as a card on the dark-theme background.
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.08f)),
             modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp),
         ) {
             Column(
@@ -299,9 +307,9 @@ private fun StoreShelf(stores: List<RetailerConfig>, filtered: Boolean, onOpenSt
 @Composable
 private fun StoreTile(retailer: RetailerConfig, onClick: () -> Unit) {
     val automated = retailer.automation == AutomationSupport.AUTOMATED
+    // No clip here: at large font sizes the badge is allowed to overhang the tile.
     Column(
         Modifier
-            .clip(MaterialTheme.shapes.medium)
             .clickable(role = Role.Button, onClickLabel = "Open ${retailer.displayName}", onClick = onClick)
             .padding(Spacing.xs)
             .testTag("store_${retailer.id}"),
@@ -313,14 +321,18 @@ private fun StoreTile(retailer: RetailerConfig, onClick: () -> Unit) {
                 if (automated) "AUTO-APPLY" else "CODES",
                 style = MaterialTheme.typography.labelSmall,
                 color = Color.White,
+                // One line always: at large font sizes the badge may overhang the tile, never wrap over the logo.
+                maxLines = 1,
+                softWrap = false,
                 modifier = Modifier
+                    .wrapContentWidth(unbounded = true)
                     .clip(RoundedCornerShape(6.dp))
                     .background(if (automated) BrandColors.Emerald else BrandColors.Indigo)
                     .padding(horizontal = 6.dp, vertical = 2.dp),
             )
         }
         Spacer(Modifier.height(Spacing.sm))
-        Text(retailer.displayName, style = MaterialTheme.typography.labelLarge, color = Color.White)
+        Text(retailer.displayName, style = MaterialTheme.typography.labelLarge, color = Color.White, maxLines = 1, softWrap = false, modifier = Modifier.wrapContentWidth(unbounded = true))
     }
 }
 
@@ -339,7 +351,7 @@ private fun ComingSoonTile() {
             Icon(Icons.Filled.Add, contentDescription = null, tint = Color.White.copy(alpha = 0.6f))
         }
         Spacer(Modifier.height(Spacing.sm))
-        Text("More soon", style = MaterialTheme.typography.labelLarge, color = Color.White.copy(alpha = 0.6f))
+        Text("More soon", style = MaterialTheme.typography.labelLarge, color = Color.White.copy(alpha = 0.6f), maxLines = 1, softWrap = false, modifier = Modifier.wrapContentWidth(unbounded = true))
     }
 }
 

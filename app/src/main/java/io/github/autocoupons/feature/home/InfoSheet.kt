@@ -32,6 +32,7 @@ import io.github.autocoupons.core.designsystem.AcBrushes
 import io.github.autocoupons.core.designsystem.AcTheme
 import io.github.autocoupons.core.designsystem.Spacing
 import io.github.autocoupons.core.designsystem.components.BrandMark
+import io.github.autocoupons.core.designsystem.components.AcSheetDragHandle
 
 enum class InfoTopic { HOW_IT_WORKS, PRIVACY, ABOUT }
 
@@ -42,6 +43,7 @@ fun InfoSheet(topic: InfoTopic, onDismiss: () -> Unit) {
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surface,
+        dragHandle = { AcSheetDragHandle() },
     ) {
         Column(
             Modifier

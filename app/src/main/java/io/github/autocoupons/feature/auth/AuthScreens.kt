@@ -233,13 +233,15 @@ private fun AuthScaffold(
                     heroTitle,
                     style = MaterialTheme.typography.headlineMedium,
                     color = Color.White,
-                    modifier = Modifier.widthIn(max = 230.dp),
+                    // Reserve the art's width rather than a fixed text width, so narrow screens and
+                    // large font sizes wrap the text instead of running it under the illustration.
+                    modifier = Modifier.padding(end = 126.dp).widthIn(max = 260.dp),
                 )
                 Text(
                     heroBody,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White.copy(alpha = 0.82f),
-                    modifier = Modifier.widthIn(max = 210.dp),
+                    modifier = Modifier.padding(end = 126.dp).widthIn(max = 240.dp),
                 )
             }
         }

@@ -17,7 +17,12 @@ Status as of 2026-10-24.
 
 ## Phase 2–3: Requirements, architecture, design
 - [x] `docs/REQUIREMENTS.md`, `docs/ARCHITECTURE.md`, `docs/UI_DESIGN.md`
-- [x] Design tokens (colour, type, shape, spacing), light and dark themes
+- [x] Design tokens (colour, type, shape, spacing), light and dark themes (dark checked on the emulator)
+- [x] Automated accessibility checks (ATF) on all native screens, browser, and results
+- [x] Small screen + 130 % text check
+- [x] Renderer-crash recovery test (`chrome://crash`)
+- [ ] Spoken TalkBack walkthrough
+- [ ] Redesigned build on a physical phone
 - [x] Contrast check of brand text/container pairs (SuccessText added)
 
 ## Phase 4: Project setup

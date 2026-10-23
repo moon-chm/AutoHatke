@@ -45,7 +45,7 @@ adb install -r app\build\outputs\apk\debug\app-debug.apk
 
 gradlew.bat testDebugUnitTest          :: 69 JVM tests
 gradlew.bat lintDebug
-gradlew.bat connectedDebugAndroidTest  :: 11 on-device tests (needs a device)
+gradlew.bat connectedDebugAndroidTest  :: 14 on-device tests, incl. accessibility and renderer crash (needs a device or emulator)
 gradlew.bat assembleProfiling          :: R8 build signed with the debug key, for performance checks
 ```
 
@@ -73,6 +73,7 @@ Every dependency, as declared in `gradle/libs.versions.toml`:
 | *Tests:* junit:junit | 4.13.2 | Unit tests |
 | *Tests:* kotlinx-coroutines-test | 1.10.2 | `runTest`, virtual time |
 | *Tests:* com.squareup.okhttp3:mockwebserver | 4.12.0 | API provider tests |
+| *Tests:* androidx.compose.ui:ui-test-junit4-accessibility | BOM (1.10.4) | Accessibility Test Framework checks in Compose tests |
 | *Tests:* androidx.test.ext:junit | 1.3.0 | Instrumented tests |
 | *Tests:* androidx.test:runner | 1.7.0 | Instrumented tests |
 | *Tests:* androidx.test.espresso:espresso-core | 3.7.0 | Required by the Compose test rule |
@@ -110,5 +111,6 @@ Details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 - The legacy live API currently returns 404, so no live coupons can be shown. The parser is tolerant, but it has never seen a real production payload; the historical schema could not be recovered.
 - Automated testing runs only on the bundled Modara sample store. Myntra is user-assisted.
 - Login and registration are offline. Sessions and savings history live in memory and end when the process dies.
-- The redesigned UI was checked on the Pixel 7 emulator (Android 16), where all 11 instrumented tests pass. An earlier build was also run on one physical device (Android 16); the redesign has not been re-run there.
+- The redesigned UI was checked on the Pixel 7 emulator (Android 16) in light and dark mode and on a small screen at 130 % text, and all 14 instrumented tests pass there. An earlier build was also run on one physical device (Android 16); the redesign has not been re-run there.
+- No spoken TalkBack walkthrough; automated accessibility checks pass.
 - No Macrobenchmark or Baseline Profile; per-app battery use was not measured.

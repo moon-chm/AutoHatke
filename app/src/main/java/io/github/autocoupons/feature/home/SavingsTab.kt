@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -43,9 +45,10 @@ import java.text.DateFormat
 import java.util.Date
 
 @Composable
-fun SavingsTab(state: HomeUiState, onStartShopping: () -> Unit) {
+fun SavingsTab(state: HomeUiState, onStartShopping: () -> Unit, listState: LazyListState = rememberLazyListState()) {
     LazyColumn(
         Modifier.fillMaxSize(),
+        state = listState,
         contentPadding = PaddingValues(bottom = 128.dp),
         verticalArrangement = Arrangement.spacedBy(Spacing.md),
         horizontalAlignment = Alignment.CenterHorizontally,

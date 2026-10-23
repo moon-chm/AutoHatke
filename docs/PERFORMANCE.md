@@ -2,7 +2,7 @@
 
 Measured on the test device (CPH2717, Android 16, arm64) on 2026-10-24, using `adb` tooling. The device was a personal phone with other apps installed, and its owner used it in between runs. Treat these numbers as indicative single-device samples, not benchmarks.
 
-**These measurements predate the UI redesign** (bundled font, gradients, Canvas illustrations, animations). They have not been repeated on the redesigned build, and the APK sizes below are from before the 176 KB font was added.
+**The table below predates the UI redesign** (bundled font, gradients, Canvas illustrations, animations). The redesigned build was re-measured on the emulator only; see [After the redesign](#after-the-redesign-emulator). Emulator and phone numbers are not comparable.
 
 ## Builds measured
 
@@ -27,6 +27,20 @@ Debug builds run Compose without R8 optimisation and with debugging hooks. Use t
 
 Session time is dominated by the Modara sample store's deliberate 450 ms simulated latency per apply or remove (7 coupons × (apply + remove) + baseline + re-apply).
 
+## After the redesign (emulator)
+
+Measured on 2026-10-24 on the Pixel 7 emulator (AVD `ac_pixel`, Android 16, x86_64, host GPU emulation), with the same commands as above.
+
+| Metric | Debug | Profiling |
+|---|---|---|
+| APK size | 13.6 MB (13,582,080 bytes) | 1.80 MB (1,801,610 bytes); the bundled font adds about 0.11 MB after compression |
+| Cold start (`TotalTime`, 6 runs) | — | 453, 395, 397, 471, 445, 450 ms |
+| Memory at Home (PSS) | — | 29.8 MB |
+| Memory in browser after a Modara session (PSS) | — | 119.8 MB, `WebViews: 1` |
+| Frame pacing (Home scroll, tab switches, store, full coupon session; 999 frames) | — | 4.5 % janky; p50 20 ms, p90 24 ms, p95 26 ms, p99 57 ms |
+
+These numbers describe the emulator, not a phone. The emulator renders through host GPU emulation (its GPU 99th percentile was reported as 4,950 ms, an emulator artefact), and its memory accounting differs from an arm64 device, so do not compare them with the device table above. Re-measuring on a physical phone is still to do.
+
 ## Design choices that affect performance
 
 - **No polling.** The checkout adapter waits for DOM changes with a `MutationObserver` keyed on `data-seq`, not with timed sleeps.
@@ -37,7 +51,7 @@ Session time is dominated by the Modara sample store's deliberate 450 ms simulat
   - calls cancelled when the coroutine is cancelled;
   - `retryOnConnectionFailure(false)`, so a dead API fails fast.
 - `LazyColumn` with stable keys (coupon code) for result lists.
-- Release builds use R8 and resource shrinking (13.2 MB → 1.69 MB).
+- Release builds use R8 and resource shrinking (13.6 MB → 1.80 MB after the redesign; 13.2 MB → 1.69 MB before it).
 
 ## Not measured
 

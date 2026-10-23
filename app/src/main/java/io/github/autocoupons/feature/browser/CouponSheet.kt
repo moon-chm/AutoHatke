@@ -69,6 +69,7 @@ import io.github.autocoupons.feature.coupons.CouponMessages
 import io.github.autocoupons.feature.coupons.CouponStatusRow
 import io.github.autocoupons.feature.coupons.WorkingCouponCard
 import kotlinx.coroutines.launch
+import io.github.autocoupons.core.designsystem.components.AcSheetDragHandle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,6 +85,7 @@ fun CouponSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surface,
+        dragHandle = { AcSheetDragHandle() },
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth().testTag("coupon_sheet"),

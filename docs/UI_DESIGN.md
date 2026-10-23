@@ -33,7 +33,7 @@ Defined in `core/designsystem/Color.kt` (`BrandColors`) and mapped in `Theme.kt`
 
 Gradients (`core/designsystem/Brushes.kt`, `AcBrushes`): **Hero** IndigoDeep → Indigo → Violet; **Primary** (buttons) Indigo → Violet; **Bubble** and **Progress** Indigo → Violet → Pink; **Success** SuccessText → Emerald.
 
-A dark theme exists (deep navy background, IndigoLight as primary), but the redesign was only checked visually in light mode.
+Dark theme: deep navy background with IndigoLight as primary. The redesign was checked on the emulator in dark mode (Login, Home, Profile, coupon progress and results). The dark store shelf has a faint white outline so it still reads as a card.
 
 ## Type, shape, spacing
 
@@ -75,4 +75,7 @@ A dark theme exists (deep navy background, IndigoLight as primary), but the rede
 - Icon buttons have content descriptions.
 - The assistant bubble is a semantic button whose description includes progress ("AutoCoupons: trying coupons, 3 of 7. Open progress").
 - The "Applying CODE…" line is a polite live region.
-- Contrast was checked with the WCAG formula for the brand text/container pairs (all ≥ 4.5:1 after the SuccessText fix). There has been no full audit with Accessibility Scanner or TalkBack.
+- Bottom sheets use a 48 dp drag handle (`AcSheetDragHandle`); Material's default 32 dp handle failed the touch-target check.
+- Hero text reserves the illustration's width, and store badges and names stay on one line, so the layout holds on a 360 dp-wide screen at 130 % font size.
+- Contrast was checked with the WCAG formula for the brand text/container pairs (all ≥ 4.5:1 after the SuccessText fix).
+- `AccessibilityChecksTest` runs Google's Accessibility Test Framework over every native screen, the browser, and the coupon results, and passes. A spoken TalkBack walkthrough has not been done.

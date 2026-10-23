@@ -1,6 +1,9 @@
 package io.github.autocoupons.feature.home
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -41,8 +44,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -70,6 +72,8 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     var tab by rememberSaveable { mutableStateOf(MainTab.HOME) }
     var sheet by rememberSaveable { mutableStateOf<InfoTopic?>(null) }
+    val homeList = rememberLazyListState()
+    val savingsList = rememberLazyListState()
     SystemBarIcons(onDarkBackground = tab != MainTab.PROFILE)
 
     LaunchedEffect(state.welcome) {
@@ -102,10 +106,12 @@ fun HomeScreen(
                     },
                     onShowSavings = { tab = MainTab.SAVINGS },
                     onShowHowItWorks = { sheet = InfoTopic.HOW_IT_WORKS },
+                    listState = homeList,
                 )
                 MainTab.SAVINGS -> SavingsTab(
                     state = state,
                     onStartShopping = { onOpenBrowser(state.retailers.first().id, null) },
+                    listState = savingsList,
                 )
                 MainTab.PROFILE -> ProfileTab(
                     state = state,
@@ -120,15 +126,22 @@ fun HomeScreen(
         }
 
         // Status-bar scrim so scrolled content never runs under the clock. On the gradient tabs it
-        // matches the hero's top edge, so it is invisible until content scrolls beneath it.
+        // fades in only once the list scrolls, so at rest the hero runs seamlessly behind the clock.
+        val list = when (tab) {
+            MainTab.HOME -> homeList
+            MainTab.SAVINGS -> savingsList
+            MainTab.PROFILE -> null
+        }
+        val scrolled by remember(list) {
+            derivedStateOf { list == null || list.firstVisibleItemIndex > 0 || list.firstVisibleItemScrollOffset > 0 }
+        }
+        val scrimAlpha by animateFloatAsState(if (scrolled) 1f else 0f, label = "scrim")
         Box(
             Modifier
                 .fillMaxWidth()
                 .windowInsetsTopHeight(WindowInsets.statusBars)
-                .background(
-                    if (tab == MainTab.PROFILE) SolidColor(MaterialTheme.colorScheme.background)
-                    else Brush.horizontalGradient(listOf(BrandColors.IndigoDeep, BrandColors.Indigo)),
-                ),
+                .graphicsLayer { alpha = scrimAlpha }
+                .background(if (tab == MainTab.PROFILE) MaterialTheme.colorScheme.background else BrandColors.IndigoDeep),
         )
 
         Column(
